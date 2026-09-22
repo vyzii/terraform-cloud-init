@@ -1,0 +1,71 @@
+name: Terraform Cloud Init
+description: Action to simplify Terraform initialization across multiple cloud providers.
+author: vyzii
+
+
+inputs:
+  cmd:
+    description: 'Command to execute. Options are "Validate" and "init"'
+  working-directory:
+    description: 'Directory containing your Terraform (.tf) files, relative to the repository root.'
+    required: false
+    default: '.'
+
+  init-backend:
+    description: 'Whether to initialize a remote Terraform backend. If false, initializes with local state instead.'
+    required: false
+    default: 'true'
+  backend-provider:
+    description: 'Cloud provider hosting the Terraform backend. Accepted values are "aws", "azure", and "gcp". Required if init-backend is true.'
+    required: false
+  backend-path:
+    description: 'Path within the backend to store the state file (e.g. /ephemeral/pr-57/). Defaults to a state file named "default.tfstate" in the backend root.'
+    required: false
+
+  aws-region:
+    description: 'AWS region to deploy resources to. Required when backend-provider is "aws" or when deploying AWS resources.'
+    required: false
+  aws-role-arn:
+    description: 'ARN of the IAM role to assume for authentication, typically via OIDC.'
+    required: false
+
+  azure-client-id:
+    description: 'Client ID of the Azure AD application (service principal) used for authentication, typically via OIDC.'
+    required: false
+  azure-tenant-id:
+    description: 'GUID of the target Azure AD tenant.'
+    required: false
+  azure-subscription-id:
+    description: 'GUID of the target Azure subscription.'
+    required: false
+
+  gcp-workload-identity-provider:
+    description: 'Full resource name of the Workload Identity Provider used for keyless authentication to GCP (e.g. projects/123/locations/global/workloadIdentityPools/pool/providers/provider).'
+    required: false
+  gcp-service-account:
+    description: 'Email of the GCP service account to impersonate for authentication.'
+    required: false
+
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v10
+
+    - name: Run Terraform init handler
+      shell: bash
+      env:
+        INIT_BACKEND: ${{ inputs.init-backend }}
+        BACKEND_PROVIDER: ${{ inputs.backend-provider }}
+        BACKEND_PATH: ${{ inputs.backend-path }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ROLE_ARN: ${{ inputs.aws-role-arn }}
+        AZURE_CLIENT_ID: ${{ inputs.azure-client-id }}
+        AZURE_TENANT_ID: ${{ inputs.azure-tenant-id }}
+        AZURE_SUBSCRIPTION_ID: ${{ inputs.azure-subscription-id }}
+        GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ inputs.gcp-workload-identity-provider }}
+        GCP_SERVICE_ACCOUNT: ${{ inputs.gcp-service-account }}
+      run: uv run ${{ github.action_path }}/src/terraform_cloud_init/main.py ${{ inputs.cmd }}
+      
