@@ -8,7 +8,7 @@ on:
 
 jobs:
   python-ci:
-    uses: vyzii/central-cicd-library/.github/workflows/python-ci.yml@main
+    uses: vyzii/central-cicd-library/.github/workflows/python-ci.yaml@main
     
 
       
