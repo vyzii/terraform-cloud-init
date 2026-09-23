@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  python-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute reusable python CI workflow
+        uses: vyzii/central-cicd-library/.github/workflows/python-ci.yml@main
+
+      
