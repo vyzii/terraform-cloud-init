@@ -8,7 +8,9 @@ on:
 
 jobs:
   python-ci:
+    permissions:
+      contents: read
+      security-events: write
     uses: vyzii/central-cicd-library/.github/workflows/python-ci.yaml@main
-    
 
       
